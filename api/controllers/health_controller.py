@@ -1,21 +1,22 @@
 from flask import Blueprint, jsonify
-from services.database_service import get_products_collection
-from services.index_service import index, products_data
+from services.database_service import get_db
 from utils.logger import logger
 from datetime import datetime
 
-bp = Blueprint('health', __name__, url_prefix='/')
+bp = Blueprint('health', __name__, url_prefix='/api')
 
 @bp.route('/health', methods=['GET'])
 def health_check():
     try:
         # Database check
-        get_products_collection().find_one()
-        # Index check
-        if not index or not products_data:
-            raise RuntimeError("Index not initialized")
+        db = get_db()
+        # Simple database operation to verify connection
+        db.collection('_health').document('check').set({'timestamp': datetime.now()})
+        db.collection('_health').document('check').delete()
+        
         return jsonify({
             "status": "healthy",
+            "service": "Visa AI Assistant API",
             "timestamp": datetime.now().isoformat()
         })
     except Exception as e:
