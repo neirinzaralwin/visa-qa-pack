@@ -2,6 +2,8 @@ import firebase_admin
 from firebase_admin import credentials, firestore
 from config import Config
 from utils.logger import logger
+import json
+import os
 
 db = None
 
@@ -31,7 +33,67 @@ def init_database():
         # Get Firestore client
         db = firestore.client()
         logger.info("Firebase Firestore connection established")
+
+        upload_conversation_to_firestore()
         
     except Exception as e:
         logger.error(f"Firebase initialization failed: {str(e)}")
         raise
+
+
+def upload_conversation_to_firestore():
+    """
+    Upload conversation data to Firestore if conversations collection doesn't exist.
+    Each conversation becomes a document with metadata.
+    """
+    try:
+        global db
+        
+        # Check if conversations collection already exists
+        conversations_ref = db.collection('conversations')
+        existing_docs = list(conversations_ref.limit(1).get())
+        
+        if existing_docs:
+            logger.info("Conversations collection already exists. Skipping upload.")
+            return
+        
+        logger.info("Conversations collection not found. Starting upload...")
+        
+        # Load conversations.json
+        conversations_path = os.path.join(os.path.dirname(__file__), '..', '..', 'data', 'conversations.json')
+        
+        if not os.path.exists(conversations_path):
+            logger.error(f"Conversations file not found at: {conversations_path}")
+            return
+        
+        with open(conversations_path, 'r', encoding='utf-8') as f:
+            conversations = json.load(f)
+        
+        logger.info(f"Loaded {len(conversations)} conversations from JSON file")
+        
+        # Upload each conversation as a document
+        for idx, conversation in enumerate(conversations):
+            # Prepare conversation data with metadata
+            conversation_data = {
+                'contact_id': conversation.get('contact_id', f'unknown_{idx}'),
+                'scenario': conversation.get('scenario', 'Unknown scenario'),
+                'messages': conversation.get('conversation', []),
+                'message_count': len(conversation.get('conversation', [])),
+                'created_at': firestore.SERVER_TIMESTAMP,
+                'processed': False,
+                'conversation_index': idx
+            }
+            
+            # Create document with custom ID
+            doc_id = f"conv_{conversation.get('contact_id', idx)}"
+            doc_ref = conversations_ref.document(doc_id)
+            doc_ref.set(conversation_data)
+            
+            logger.info(f"Uploaded conversation {idx + 1}/{len(conversations)}: {doc_id}")
+        
+        logger.info(f"✅ Successfully uploaded {len(conversations)} conversations to Firestore")
+        
+    except Exception as e:
+        logger.error(f"Failed to upload conversations to Firestore: {str(e)}")
+        raise
+    
