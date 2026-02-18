@@ -99,3 +99,37 @@ def improve_ai_manually():
         
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
+@chat_controller.route('/prompt', methods=['GET'])
+def get_current_prompt():
+    """Get the current AI prompt"""
+    try:
+        current_prompt = get_prompt()
+        return jsonify({
+            'prompt': current_prompt
+        })
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@chat_controller.route('/prompt', methods=['PUT'])
+def update_current_prompt():
+    """Update the AI prompt directly"""
+    try:
+        data = request.get_json()
+        
+        # Validate required fields
+        if not data or 'prompt' not in data:
+            return jsonify({'error': 'prompt is required'}), 400
+        
+        new_prompt = data['prompt']
+        
+        # Update prompt in database
+        update_prompt(new_prompt)
+        
+        return jsonify({
+            'message': 'Prompt updated successfully',
+            'prompt': new_prompt
+        })
+        
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500

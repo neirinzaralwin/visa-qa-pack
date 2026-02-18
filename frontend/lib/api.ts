@@ -35,6 +35,19 @@ export interface ImproveAIManuallyResponse {
   updatedPrompt: string;
 }
 
+export interface GetPromptResponse {
+  prompt: string;
+}
+
+export interface UpdatePromptRequest {
+  prompt: string;
+}
+
+export interface UpdatePromptResponse {
+  message: string;
+  prompt: string;
+}
+
 const api = axios.create({
   baseURL: API_BASE_URL,
   headers: {
@@ -55,6 +68,16 @@ export const aiAssistantApi = {
 
   improveAIManually: async (data: ImproveAIManuallyRequest): Promise<ImproveAIManuallyResponse> => {
     const response = await api.post('/improve-ai-manually', data);
+    return response.data;
+  },
+
+  getPrompt: async (): Promise<GetPromptResponse> => {
+    const response = await api.get('/prompt');
+    return response.data;
+  },
+
+  updatePrompt: async (data: UpdatePromptRequest): Promise<UpdatePromptResponse> => {
+    const response = await api.put('/prompt', data);
     return response.data;
   },
 };
