@@ -17,8 +17,14 @@ class GoogleAIService:
             role = "CONSULTANT" if msg["role"] == "consultant" else "CLIENT"
             history_text += f"- ({role}) {msg['message']}\n"
         
-        # Use a simple, reliable prompt without string formatting
-        formatted_prompt = f"""You are a visa consultant specializing in Thai DTV visas. Your responses should be:
+        # Use the provided prompt or fall back to default
+        if prompt:
+            # Replace placeholders in the custom prompt
+            formatted_prompt = prompt.replace("{client_sequence}", client_sequence).replace("{chat_history}", history_text)
+            print(f"Using custom prompt from Firestore: {prompt[:100]}...")
+        else:
+            # Use the default hardcoded prompt
+            formatted_prompt = f"""You are a visa consultant specializing in Thai DTV visas. Your responses should be:
 - Human and casual, not robotic
 - Helpful and informative
 - Concise but thorough
@@ -31,6 +37,7 @@ Client message: {client_sequence}
 
 Chat history:
 {history_text}"""
+            print("Using default hardcoded prompt")
         
         try:
             response = self.model.generate_content(formatted_prompt)

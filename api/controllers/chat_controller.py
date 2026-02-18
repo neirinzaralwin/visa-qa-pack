@@ -20,6 +20,7 @@ def generate_reply():
         
         # Get current prompt from database
         current_prompt = get_prompt()
+        print(f"Controller: Retrieved prompt from database: {current_prompt[:100]}...")
         
         # Generate AI reply
         ai_reply = ai_service.generate_reply(client_sequence, chat_history, current_prompt)

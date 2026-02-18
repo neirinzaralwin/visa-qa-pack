@@ -6,7 +6,7 @@ load_dotenv()
 class Config:
     # Google AI Studio configuration
     GOOGLE_AI_API_KEY = os.getenv("GOOGLE_AI_API_KEY")
-    GOOGLE_AI_MODEL = os.getenv("GOOGLE_AI_MODEL", "gemini-1.5-flash")
+    GOOGLE_AI_MODEL = os.getenv("GOOGLE_AI_MODEL", "gemini-2.5-flash-lite")
     
     # Firebase configuration
     FIREBASE_PROJECT_ID = os.getenv("FIREBASE_PROJECT_ID")

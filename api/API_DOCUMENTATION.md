@@ -166,7 +166,7 @@ Checks if the API is running.
 Make sure your `.env` file contains:
 ```
 GOOGLE_AI_API_KEY=your_google_ai_studio_api_key_here
-GOOGLE_AI_MODEL=gemini-1.5-flash
+GOOGLE_AI_MODEL=gemini-2.5-flash-lite
 ```
 
 ## Error Responses
