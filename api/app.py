@@ -1,6 +1,6 @@
 import os
 from flask import Flask
-from controllers import health_controller
+from controllers import health_controller, chat_controller
 from config import Config
 
 def create_app():
@@ -11,6 +11,7 @@ def create_app():
     init_database()
     
     app.register_blueprint(health_controller.bp)
+    app.register_blueprint(chat_controller.chat_controller)
     
     return app
 

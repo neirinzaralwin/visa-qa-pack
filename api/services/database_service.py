@@ -96,4 +96,57 @@ def upload_conversation_to_firestore():
     except Exception as e:
         logger.error(f"Failed to upload conversations to Firestore: {str(e)}")
         raise
+
+def get_prompt():
+    """Get the current AI prompt from database"""
+    try:
+        global db
+        if not db:
+            init_database()
+        
+        prompt_ref = db.collection('ai_config').document('chat_prompt')
+        doc = prompt_ref.get()
+        
+        if doc.exists:
+            return doc.to_dict().get('prompt', _get_default_prompt())
+        else:
+            # Create default prompt if it doesn't exist
+            default_prompt = _get_default_prompt()
+            prompt_ref.set({'prompt': default_prompt})
+            return default_prompt
+            
+    except Exception as e:
+        logger.error(f"Failed to get prompt: {str(e)}")
+        return _get_default_prompt()
+
+def update_prompt(new_prompt):
+    """Update the AI prompt in database"""
+    try:
+        global db
+        if not db:
+            init_database()
+        
+        prompt_ref = db.collection('ai_config').document('chat_prompt')
+        prompt_ref.set({'prompt': new_prompt})
+        logger.info("AI prompt updated successfully")
+        
+    except Exception as e:
+        logger.error(f"Failed to update prompt: {str(e)}")
+        raise
+
+def _get_default_prompt():
+    """Get the default AI prompt"""
+    return """You are a visa consultant specializing in Thai DTV visas. Your responses should be:
+- Human and casual, not robotic
+- Helpful and informative
+- Concise but thorough
+- Friendly and approachable
+
+Based on the client's message and chat history, provide an appropriate response in JSON format:
+{{"reply": "your response here"}}
+
+Client message: {client_sequence}
+
+Chat history:
+{chat_history}"""
     
