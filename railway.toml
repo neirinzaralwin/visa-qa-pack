@@ -1,11 +1,8 @@
 [build]
 builder = "nixpacks"
 
-[phases.setup]
-nixPkgs = ["python311"]
-
-[phases.install]
-cmds = ["pip install --no-cache-dir -r requirements.txt"]
-
-[start]
-cmd = "python simple_app.py"
+[deploy]
+healthcheckPath = "/"
+healthcheckTimeout = 100
+restartPolicyType = "on_failure"
+restartPolicyMaxRetries = 10
