@@ -12,6 +12,11 @@ def init_database():
     try:
         logger.info("Initializing Firebase Firestore service...")
         
+        # Check if required environment variables are available
+        if not all([Config.FIREBASE_PROJECT_ID, Config.FIREBASE_PRIVATE_KEY, Config.FIREBASE_CLIENT_EMAIL]):
+            logger.warning("Firebase credentials not fully configured. Database features will be limited.")
+            return
+        
         # Create credentials dictionary from environment variables
         credentials_dict = {
             "type": "service_account",
@@ -38,7 +43,8 @@ def init_database():
         
     except Exception as e:
         logger.error(f"Firebase initialization failed: {str(e)}")
-        raise
+        # Don't raise the exception - allow the app to start without database
+        logger.warning("App will continue without database connectivity.")
 
 
 def upload_conversation_to_firestore():
