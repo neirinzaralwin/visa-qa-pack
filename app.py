@@ -1,6 +1,9 @@
 import os
 import sys
-sys.path.append('api')
+
+# Add api directory to Python path
+api_path = os.path.join(os.path.dirname(__file__), 'api')
+sys.path.insert(0, api_path)
 
 try:
     from flask import Flask
