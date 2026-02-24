@@ -25,7 +25,7 @@ def create_app():
         print(f"⚠️  Database initialization failed: {e}")
     
     app.register_blueprint(health_controller.bp)
-    app.register_blueprint(chat_controller.chat_controller)
+    app.register_blueprint(chat_controller.chat_controller, url_prefix='/api')
     
     return app
 
