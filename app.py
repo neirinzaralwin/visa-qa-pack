@@ -1,10 +1,6 @@
 import os
 import sys
 
-# Add api directory to Python path
-api_path = os.path.join(os.path.dirname(__file__), 'api')
-sys.path.insert(0, api_path)
-
 try:
     from flask import Flask
     from flask_cors import CORS
