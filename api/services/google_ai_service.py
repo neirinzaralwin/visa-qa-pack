@@ -5,11 +5,17 @@ from config import Config
 
 class GoogleAIService:
     def __init__(self):
-        genai.configure(api_key=Config.GOOGLE_AI_API_KEY)
-        self.model = genai.GenerativeModel(Config.GOOGLE_AI_MODEL)
+        if Config.GOOGLE_AI_API_KEY:
+            genai.configure(api_key=Config.GOOGLE_AI_API_KEY)
+            self.model = genai.GenerativeModel(Config.GOOGLE_AI_MODEL)
+        else:
+            self.model = None
     
     def generate_reply(self, client_sequence: str, chat_history: List[Dict[str, str]], prompt: str = None) -> str:
         """Generate AI reply based on client sequence and chat history"""
+        
+        if not self.model:
+            return json.dumps({"reply": "AI service not configured. Please set GOOGLE_AI_API_KEY environment variable."})
         
         # Format chat history
         history_text = ""

@@ -5,6 +5,37 @@ from services.database_service import get_prompt, update_prompt
 chat_controller = Blueprint('chat', __name__)
 ai_service = GoogleAIService()
 
+@chat_controller.route('/chat', methods=['POST'])
+def chat():
+    """Simple chat endpoint for frontend compatibility"""
+    try:
+        data = request.get_json()
+        
+        # Validate required fields
+        if not data or 'message' not in data:
+            return jsonify({'error': 'message is required'}), 400
+        
+        message = data['message']
+        session_id = data.get('session_id', 'default')
+        chat_history = data.get('chat_history', [])
+        
+        # Get current prompt from database
+        current_prompt = get_prompt()
+        
+        # Generate AI reply
+        ai_reply = ai_service.generate_reply(message, chat_history, current_prompt)
+        
+        return jsonify({
+            'reply': ai_reply,
+            'session_id': session_id
+        })
+        
+    except Exception as e:
+        import traceback
+        print(f"Chat error: {e}")
+        traceback.print_exc()
+        return jsonify({'error': str(e)}), 500
+
 @chat_controller.route('/generate-reply', methods=['POST'])
 def generate_reply():
     """Generate an AI response based on conversation context"""
